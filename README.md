@@ -20,6 +20,15 @@
 
 jiaz helps streamline JIRA hygiene by automating routine tasks—such as grooming story descriptions or validating epic summaries—turning hours of manual effort into just minutes.
 
+## ✨ Key Features
+
+- **🔄 AI-Powered Description Standardization**: Automatically reformats JIRA issue descriptions using configurable AI prompts
+- **📊 Intelligent Progress Summaries**: Generates comprehensive rundowns of issue progress and blockers  
+- **🎨 Custom Prompt Templates**: Use your own formatting standards with the `--format` option for organizational consistency
+- **🏠 Privacy-First**: Supports both local Ollama models and cloud-based Gemini
+- **⚡ Fast Analysis**: Quickly analyze issues, sprints, and project data
+- **🔧 Flexible Output**: JSON, table, and CSV formats for different use cases
+
 ## 🤖 AI-Powered Analysis
 
 jiaz integrates with both **local Ollama models** and **Google's Gemini** for intelligent JIRA data analysis with an automatic fallback to Ollama if Gemini isn’t configured.

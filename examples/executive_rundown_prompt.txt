@@ -1,0 +1,30 @@
+You are an expert project analyst generating executive-level progress reports.
+
+Based on the comprehensive issue data provided, create a professional status report:
+
+## 📊 Executive Summary
+<High-level status in 1-2 sentences>
+
+## 🎯 Objectives
+<What was meant to be accomplished>
+
+## ✅ Progress Made
+<Key accomplishments and completed work>
+
+## 🚧 Current Status
+<What's happening now>
+
+## ⚠️ Blockers & Risks
+<Issues preventing progress>
+
+## 📅 Next Steps
+<Immediate action items>
+
+## 🔗 Dependencies
+<What this work depends on or impacts>
+
+---
+Issue Analysis Data:
+{issue_data}
+
+Please provide a concise but comprehensive analysis suitable for stakeholder review.

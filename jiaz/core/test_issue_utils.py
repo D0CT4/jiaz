@@ -172,6 +172,7 @@ class TestIssueUtilsFunctions:
             show=["key", "title"],
             rundown=False,
             marshal_description=False,
+            format_file=None,
         )
 
         mock_jira_comms.assert_called_once_with(config_name="test_config")

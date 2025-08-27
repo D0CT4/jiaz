@@ -83,6 +83,7 @@ jiaz analyze issue ISSUE_ID [OPTIONS]
 - `--config-name, -c`: Configuration name to use (default: active config)
 - `--rundown, -r`: Generate AI-powered progress summary
 - `--marshal-description, -m`: Standardize issue description using AI
+- `--format, -f`: Path to custom prompt format file for AI processing (requires `--marshal-description` or `--rundown`)
 
 **Examples:**
 
@@ -99,11 +100,19 @@ jiaz analyze issue PROJ-123 --rundown
 # Standardize issue description with AI
 jiaz analyze issue PROJ-123 --marshal-description
 
+# Use custom prompt format for description standardization
+jiaz analyze issue PROJ-123 --marshal-description --format /path/to/custom-prompt.txt
+
+# Generate AI-powered progress summary with custom prompt
+jiaz analyze issue PROJ-123 --rundown --format /path/to/custom-rundown-prompt.txt
+
 # Use specific configuration
 jiaz analyze issue PROJ-123 --config-name myconfig
 ```
 
-**⚠️ Note:** `--rundown` and `--marshal-description` options are mutually exclusive.
+**⚠️ Note:** 
+- `--rundown` and `--marshal-description` options are mutually exclusive
+- `--format` option can only be used with `--marshal-description` or `--rundown`
 
 ---
 
@@ -118,6 +127,29 @@ jiaz analyze issue PROJ-123 --config-name myconfig
 - Converts JIRA markup to standardized format
 - Improves readability and consistency
 - AI-powered content enhancement
+
+### 🎨 Custom Prompt Formats (`--format`)
+- Use custom prompt templates for AI processing
+- Override default prompt structures
+- Create organization-specific formatting standards
+
+**Custom Prompt Example:**
+```text
+You are an expert in writing clear and concise JIRA issue descriptions.
+
+Your job is to take the input description & title and return it reformatted:
+
+**Custom AI Generated Description**
+
+**What needs to be done:**
+<Brief description of the task>
+
+**Acceptance Criteria:**
+<What defines completion>
+
+Title: {title}
+Description: {description}
+```
 
 ---
 

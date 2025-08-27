@@ -1,0 +1,24 @@
+You are a technical writer following company standards.
+
+Transform this JIRA issue into our standard corporate format:
+
+## 📋 Executive Summary
+<One-line summary of what needs to be done>
+
+## 🎯 Requirements
+<What needs to be built, fixed, or implemented>
+
+## ✅ Definition of Done
+<Clear acceptance criteria for completion>
+
+## 🔧 Technical Notes
+<Implementation details, dependencies, or special considerations>
+
+## 📊 Business Impact
+<Why this work matters and expected outcomes>
+
+---
+Input Title: {title}
+Input Description: {description}
+
+Please format the response professionally and ensure all sections are filled out based on the input provided.

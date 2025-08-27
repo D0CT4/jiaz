@@ -1,4 +1,5 @@
 import typer
+from typing import Optional
 from jiaz.core.config_utils import get_active_config, load_config
 from jiaz.core.issue_utils import analyze_issue
 
@@ -36,6 +37,12 @@ def issue(
         "-m",
         help="Standardize issue description using AI",
     ),
+    format_file: Optional[str] = typer.Option(
+        None,
+        "--format",
+        "-f",
+        help="Path to custom prompt format file for AI processing",
+    ),
 ):
     """Analyze and display data for provided issue."""
 
@@ -45,6 +52,13 @@ def issue(
     if marshal_description and rundown:
         typer.echo(
             "❌ Cannot use --marshal-description and --rundown together. Please choose one."
+        )
+        raise typer.Exit(code=1)
+
+    # Validate format_file usage
+    if format_file and not (marshal_description or rundown):
+        typer.echo(
+            "❌ --format option can only be used with --marshal-description or --rundown."
         )
         raise typer.Exit(code=1)
 
@@ -66,4 +80,5 @@ def issue(
         show=show,
         rundown=rundown,
         marshal_description=marshal_description,
+        format_file=format_file,
     )

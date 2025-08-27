@@ -535,18 +535,33 @@ def extract_comment_details(comments):
     return comment_list
 
 
-def generate_rundown(jira, issue_data):
+def generate_rundown(jira, issue_data, format_file=None):
     """
     Generate AI-powered progress summary for the issue.
 
     Args:
         jira: JiraComms instance
         issue_data: JIRA issue object
+        format_file: Path to custom prompt format file
     """
     from jiaz.core.ai_utils import JiraIssueAI
     from jiaz.core.config_utils import should_use_gemini
     from jiaz.core.formatter import colorize, strip_ansi
     from jiaz.core.prompts.issue_summary import SUMMARY_PROMPT
+
+    # Load custom prompt if provided
+    custom_prompt = SUMMARY_PROMPT
+    if format_file:
+        try:
+            with open(format_file, 'r', encoding='utf-8') as f:
+                custom_prompt = f.read()
+            typer.echo(colorize(f"📄 Using custom prompt from: {format_file}", "info"))
+        except FileNotFoundError:
+            typer.echo(colorize(f"❌ Custom prompt file not found: {format_file}", "neg"))
+            return False
+        except Exception as e:
+            typer.echo(colorize(f"❌ Error reading custom prompt file: {e}", "neg"))
+            return False
 
     # Check if Gemini AI is available, else exit with context window message
     if not should_use_gemini():
@@ -631,7 +646,7 @@ def generate_rundown(jira, issue_data):
         )
 
         def generate_summary():
-            formatted_prompt = SUMMARY_PROMPT.format(issue_data=issue_summary)
+            formatted_prompt = custom_prompt.format(issue_data=issue_summary)
             return jira_ai.llm.query_model(formatted_prompt)
 
         summary_response = _execute_with_retry(
@@ -655,20 +670,34 @@ def generate_rundown(jira, issue_data):
 
 
 # AI backed function for updated description
-def marshal_issue_description(jira, issue_data):
+def marshal_issue_description(jira, issue_data, format_file=None):
     """
     Marshal (standardize) issue description using AI and handle user confirmation.
 
     Args:
         jira: JiraComms instance
         issue_data: JIRA issue object
-        output_format: Display format for comparison
+        format_file: Path to custom prompt format file
 
     Returns:
         bool: True if description was updated, False otherwise
     """
     from jiaz.core.ai_utils import JiraIssueAI
     from jiaz.core.display import display_markup_description
+
+    # Load custom prompt if provided
+    custom_prompt = None
+    if format_file:
+        try:
+            with open(format_file, 'r', encoding='utf-8') as f:
+                custom_prompt = f.read()
+            typer.echo(colorize(f"📄 Using custom prompt from: {format_file}", "info"))
+        except FileNotFoundError:
+            typer.echo(colorize(f"❌ Custom prompt file not found: {format_file}", "neg"))
+            return False
+        except Exception as e:
+            typer.echo(colorize(f"❌ Error reading custom prompt file: {e}", "neg"))
+            return False
 
     # Get current description and title from generic function
     required_fields = get_issue_fields(jira, issue_data, ["description", "title"])
@@ -690,7 +719,7 @@ def marshal_issue_description(jira, issue_data):
         )
         standardized_description = _execute_with_retry(
             lambda: jira_ai.standardize_description(
-                original_description, original_title
+                original_description, original_title, custom_prompt=custom_prompt
             ),
             "standardizing description",
         )
@@ -753,12 +782,15 @@ def marshal_issue_description(jira, issue_data):
                     from jiaz.core.ai_utils import JiraIssueAI
 
                     jira_ai = JiraIssueAI()
-                    compare_result = _execute_with_retry(
-                        lambda: jira_ai.compare_descriptions(
-                            standardized_description, terminal_friendly_output
-                        ),
-                        "comparing descriptions for accuracy",
-                    )
+                    if terminal_friendly_output is not None:
+                        compare_result = _execute_with_retry(
+                            lambda: jira_ai.compare_descriptions(
+                                standardized_description, terminal_friendly_output
+                            ),
+                            "comparing descriptions for accuracy",
+                        )
+                    else:
+                        compare_result = None
 
                     if compare_result is None:
                         # If comparison failed, still show the output but with warning
@@ -1019,6 +1051,7 @@ def analyze_issue(
     show="<pre-defined>",
     rundown=False,
     marshal_description=False,
+    format_file=None,
 ):
     """
     Analyze and display data for provided issue.
@@ -1031,6 +1064,7 @@ def analyze_issue(
         show: List of field names to be shown.
         rundown: Boolean to generate AI-powered progress summary.
         marshal_description: Boolean to standardize issue description using AI.
+        format_file: Path to custom prompt format file for AI processing.
     """
 
     jira = JiraComms(config_name=config)
@@ -1046,13 +1080,13 @@ def analyze_issue(
     # Handle rundown if requested
     if rundown:
         typer.echo(colorize(f"🔍 Analyzing JIRA {issue_type}: {issue_data.key}", "info"))
-        generate_rundown(jira, issue_data)
+        generate_rundown(jira, issue_data, format_file=format_file)
         return
 
     # Handle description marshaling if requested
     if marshal_description:
         typer.echo(colorize(f"🔍 Analyzing JIRA {issue_type}: {issue_data.key}", "info"))
-        marshal_issue_description(jira, issue_data)
+        marshal_issue_description(jira, issue_data, format_file=format_file)
         # For marshal description, we only show the comparison and exit
         return
 
